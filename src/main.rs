@@ -7,7 +7,7 @@ use cortex_m_rt::entry;
 
 #[entry]
 fn main() -> ! {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    // let cp = cortex_m::Peripherals::take().unwrap();
     let dp = pac::Peripherals::take().unwrap();
 
     let pwr = dp.PWR.constrain();
@@ -19,13 +19,14 @@ fn main() -> ! {
     let gpioe = dp.GPIOE.split(ccdr.peripheral.GPIOE);
     let mut led = gpioe.pe1.into_push_pull_output();
 
-    let mut delay = cp.SYST.delay(ccdr.clocks);
+    let gpioc = dp.GPIOC.split(ccdr.peripheral.GPIOC);
+    let but = gpioc.pc13.into_pull_down_input();
 
     loop {
-        led.set_high();
-        delay.delay_ms(500_u16);
-
-        led.set_low();
-        delay.delay_ms(500_u16);
+        if but.is_high() {
+           led.set_high();
+        } else {
+           led.set_low();
+        }
     }
 }
